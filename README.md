@@ -1,5 +1,5 @@
-Dart retrace
-============
+retrace
+=======
 
 A command line utility to regenerate stack traces for minified Dart applications compiled with dart2js.
 
