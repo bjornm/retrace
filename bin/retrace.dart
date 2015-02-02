@@ -7,7 +7,7 @@ import 'package:retrace/retrace.dart';
 main(List<String> args) {
   if (args.length != 1) {
     print("Usage: retrace <map>");
-    exit(-1);
+    exit(1);
   }
 
   try {
@@ -26,6 +26,6 @@ main(List<String> args) {
     }
   } on ArgumentError catch (e) {
     print(e);
-    exit(-1);
+    exit(1);
   }
 }
