@@ -11,14 +11,15 @@ main(List<String> args) {
   }
 
   try {
-    var retracer = new Retracer(args[0]);
-    print("Paste your minified trace here:");
+    var retracer = new Retracer(args[0], useColors: stdout.hasTerminal);
+    if(stdioType(stdin) == StdioType.TERMINAL)
+      print("Paste your minified trace here:");
     var lines = [];
     while(true) {
       var line = stdin.readLineSync();
-      if (line.isEmpty) {
+      if (line == null || line.isEmpty) {
         String trace = retracer.run(lines);
-        print("\n$trace\n");
+        print("$trace");
         break;
       } else {
         lines.add(line);
