@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+
+- Improved support for non-interactive use. The "Paste your minified trace here:" message is only printed if stdin is a terminal. The escape codes to colorize output are only printed if stdout is a terminal. Thanks to Matt Liberty for this patch!
+
 ## 1.0.2
 
 - Bug fix; when program exited with an error code it was rerun by pub global activate wrapper script.

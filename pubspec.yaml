@@ -1,5 +1,5 @@
 name: retrace
-version: 1.0.2
+version: 1.0.3
 description: Regenerates minified stacktraces.
 author: Björn Melinder <bjorn.melinder@gmail.com>
 homepage: https://github.com/bjornm/retrace
