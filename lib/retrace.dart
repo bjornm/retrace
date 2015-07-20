@@ -7,8 +7,9 @@ import 'package:path/path.dart' as p;
 class Retracer {
   Mapping _mapping;
   List<String> _output = [];
+  bool useColors;
 
-  Retracer(String filename) {
+  Retracer(String filename, {this.useColors}) {
     try {
       var json = new File(filename).readAsStringSync();
       _mapping = parse(json);
@@ -30,7 +31,7 @@ class Retracer {
         // therefore, make a new search with the preceding line
         span = _mapping.spanFor(lineCol.line - 2, 99999);
         if (span == null) {
-          _output.add("${Colors.YELLOW}$text${Colors.NONE}");
+          _output.add(yellow(text));
           continue;
         }
       }
@@ -46,7 +47,7 @@ class Retracer {
         source = "";
       }
       source = "$source:${span.start.line + 1}".padRight(40);
-      _output.add('    at $source ${Colors.RED}${span.text}${Colors.NONE} (col ${span.start.column + 1})');
+      _output.add('    at $source ${red(text)} (col ${span.start.column + 1})');
     };
     return _output.join("\n");
   }
@@ -68,6 +69,9 @@ class Retracer {
     var column = int.parse(match[3]);
     return new LineCol(line, column);
   }
+
+  String red(String text) => useColors ? "${Colors.RED}${text}${Colors.NONE}" : text;
+  String yellow(String text) => useColors ? "${Colors.YELLOW}${text}${Colors.NONE}" : text;
 }
 
 class LineCol {
