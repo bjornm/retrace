@@ -1,15 +1,14 @@
 library dartclient_demin;
 
 import 'dart:io';
+import 'dart:convert';
 import 'package:source_maps/source_maps.dart';
 import 'package:path/path.dart' as p;
 
 class Retracer {
   Mapping _mapping;
-  List<String> _output = [];
-  bool useColors;
 
-  Retracer(String filename, {this.useColors}) {
+  Retracer(String filename) {
     try {
       var json = new File(filename).readAsStringSync();
       _mapping = parse(json);
@@ -18,11 +17,12 @@ class Retracer {
     }
   }
 
-  String run(List<String> trace) {
+  List<RetracedLine> run(List<String> trace) {
+    var output = <RetracedLine>[];
     for(String text in trace) {
       var lineCol = parseLine(text);
       if (lineCol == null) {
-        _output.add(text);
+        output.add(new RetracedLine.notParsed(text));
         continue;
       }
       var span = _mapping.spanFor(lineCol.line - 1, lineCol.col - 1);
@@ -31,11 +31,11 @@ class Retracer {
         // therefore, make a new search with the preceding line
         span = _mapping.spanFor(lineCol.line - 2, 99999);
         if (span == null) {
-          _output.add(yellow(text));
+          output.add(new RetracedLine.notLocated(text));
           continue;
         }
       }
-      //    output.add('${span.message("", color:true)}');
+
       var source = p.prettyUri(span.sourceUrl);
       if (source != null) {
         var parts = source.split("/");
@@ -46,10 +46,9 @@ class Retracer {
       } else {
         source = "";
       }
-      source = "$source:${span.start.line + 1}".padRight(40);
-      _output.add('    at $source ${red(text)} (col ${span.start.column + 1})');
+      output.add(new RetracedLine(source, text, span.start.line + 1, span.start.column + 1));
     };
-    return _output.join("\n");
+    return output;
   }
 
   static LineCol parseLine(String text) {
@@ -69,9 +68,6 @@ class Retracer {
     var column = int.parse(match[3]);
     return new LineCol(line, column);
   }
-
-  String red(String text) => useColors ? "${Colors.RED}${text}${Colors.NONE}" : text;
-  String yellow(String text) => useColors ? "${Colors.YELLOW}${text}${Colors.NONE}" : text;
 }
 
 class LineCol {
@@ -86,6 +82,67 @@ class LineCol {
     return o.line == line && o.col == col;
   }
   int get hashCode => line + col;
+}
+
+class RetracedLine {
+  final String source;
+  final String raw;
+  final int line;
+  final int col;
+  final bool parsed;
+  final bool located;
+
+  RetracedLine(this.source, this.raw, this.line, this.col):
+        parsed = true, located = true;
+  RetracedLine.notLocated(this.raw):
+        parsed = true, located = false,
+        source = null, line = null, col = null;
+  RetracedLine.notParsed(this.raw):
+        parsed = false, located = false,
+        source = null, line = null, col = null;
+}
+
+class TextFormatter {
+  final bool useColors;
+  TextFormatter({this.useColors: false});
+
+  String format(List<RetracedLine> trace){
+    var output = new StringBuffer();
+    for(var line in trace) {
+      if(!line.parsed){
+        output.writeln(line.raw);
+        continue;
+      }
+      if(!line.located){
+        output.writeln(yellow(line.raw));
+      }
+
+      output.write('    at ');
+      output.write("${line.source}:${line.line}".padRight(40));
+      output.write(' ');
+      output.write(red(line.raw));
+      output.write(' (col ${line.col})');
+      output.writeln();
+    };
+    return output.toString();
+  }
+
+  String red(String text) => useColors ? "${Colors.RED}${text}${Colors.NONE}" : text;
+  String yellow(String text) => useColors ? "${Colors.YELLOW}${text}${Colors.NONE}" : text;
+}
+
+class JsonFormatter {
+  String format(List<RetracedLine> trace){
+    return new JsonEncoder.withIndent('  ')
+        .convert(trace.map(_lineToJson).toList());
+  }
+
+  static Map _lineToJson(RetracedLine line) => {
+    'source': line.source,
+    'raw': line.raw,
+    'line': line.line,
+    'column': line.col,
+  };
 }
 
 class Colors {
