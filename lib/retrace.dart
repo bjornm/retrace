@@ -75,13 +75,14 @@ class LineCol {
   final int col;
   LineCol(this.line, this.col);
   bool operator == (other) {
-    if (!other is LineCol) {
+    if (!(other is LineCol)) {
       return false;
     }
     var o = (other as LineCol);
     return o.line == line && o.col == col;
   }
   int get hashCode => line + col;
+  String toString() => "$line:$col";
 }
 
 class RetracedLine {
