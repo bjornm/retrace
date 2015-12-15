@@ -19,5 +19,8 @@ void main() {
     it('should parse safari format', () {
       expect(Retracer.parseLine("R5@http://www.example.com/example.dart.js:17106:31")).toEqual(new LineCol(17106, 31));
     });
+    it('should parse stack_trace package format', () {
+      expect(Retracer.parseLine("game.html.polymer.bootstrap.dart.js 21400:6   Pc.dart.Pc.bh")).toEqual(new LineCol(21400, 6));
+    });
   });
 }

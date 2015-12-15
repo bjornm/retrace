@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Added support for parsing traces generated from the Trace class of the stack_trace dart package.
+
 ## 1.1.0
 
 - Added --format option which accepts either a 'text' or 'json' argument. Text format, the default, prints the same as before. The json format pretty-prints a list of objects whith keys source, raw, line and column. Thanks to Danny Kirchmeier for this patch!

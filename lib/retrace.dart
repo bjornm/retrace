@@ -56,9 +56,12 @@ class Retracer {
     if (new RegExp("\\s*at ").hasMatch(text)) {
       // chrome syntax
       match = new RegExp("\\s*at [^(]+ \\((.*):(\\d+):(\\d+)\\)").firstMatch(text);
-    } else {
-      // safari syntx
+    } else if (new RegExp("@").hasMatch(text)){
+      // safari syntax
       match = new RegExp("\\s*[^@]+\\@(.*):(\\d+):(\\d+)").firstMatch(text);
+    } else {
+      // stack_trace package syntax
+      match = new RegExp("(.*)\\s+(\\d+):(\\d+)\\s+.*").firstMatch(text);
     }
     if (match == null) {
       return null;
