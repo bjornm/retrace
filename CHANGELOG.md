@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- Works on dart 2, thanks to spebbe for patch.
+
 ## 1.1.1
 
 - Added support for parsing traces generated from the Trace class of the stack_trace dart package.
