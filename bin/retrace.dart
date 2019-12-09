@@ -25,13 +25,13 @@ main(List<String> args) {
     print(parser.usage);
     exit(1);
   }
-  String format = argResults['format'];
+  String format = argResults['format'] as String;
 
   try {
     var retracer = new Retracer(argResults.rest.single);
     if(stdioType(stdin) == StdioType.TERMINAL && format == 'text')
       print("Paste your minified trace here:");
-    var lines = [];
+    var lines = <String>[];
     while(true) {
       var line = stdin.readLineSync();
       if (line == null || line.isEmpty) {

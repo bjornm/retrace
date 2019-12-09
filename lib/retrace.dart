@@ -67,8 +67,8 @@ class Retracer {
       return null;
     }
 
-    var line = int.parse(match[2]);
-    var column = int.parse(match[3]);
+    var line = int.parse(match[2] as String);
+    var column = int.parse(match[3] as String);
     return new LineCol(line, column);
   }
 }
